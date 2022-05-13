@@ -8,5 +8,4 @@ pluginManagement {
 rootProject.name = "Githunt"
 
 include(":app")
-//include(":api")
-
+include(":api")

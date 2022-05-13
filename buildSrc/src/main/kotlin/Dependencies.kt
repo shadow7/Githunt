@@ -1,24 +1,16 @@
-@file:Suppress("unused")
-
 object Dependencies {
     object Classpath {
-        const val composeGradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:${Versions.composeGradlePlugin}"
         const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
         const val androidGradleTools = "com.android.tools.build:gradle:${Versions.gradleToolsVersion}"
         const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
     }
 
     object JetBrains {
-        object Kotlin {
-            const val stdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}"
-            const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
-            const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
-            const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:${Versions.kotlinVersion}"
-            const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlinVersion}"
-            const val testJs = "org.jetbrains.kotlin:kotlin-test-js:${Versions.kotlinVersion}"
-            const val testAnnotationsCommon =
-                "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlinVersion}"
-        }
+        const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
+
+        private const val coroutineVersion = "1.3.8"
+        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
+        const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVersion"
     }
 
     object AndroidX {
