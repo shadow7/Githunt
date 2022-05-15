@@ -1,11 +1,7 @@
 plugins {
-    kotlin("android")
     id("com.android.application")
-}
-
-repositories {
-    google()
-    mavenCentral()
+    kotlin("android")
+    `android-config-plugin`
 }
 
 dependencies {
@@ -13,26 +9,16 @@ dependencies {
     implementation(Dependencies.AndroidX.appCompat)
     implementation(Dependencies.AndroidX.composeUi)
     implementation(Dependencies.AndroidX.composeMaterial)
-    implementation(Dependencies.AndroidX.composeUiPreview)
     implementation(Dependencies.Google.material)
+    api(project(":uiSearch"))
 }
 
 @Suppress("UnstableApiUsage")
 android {
-    compileSdk = AndroidConfig.compileSdk
     defaultConfig {
         applicationId = AndroidConfig.applicationId
-        minSdk = AndroidConfig.minSdk
-        targetSdk = AndroidConfig.targetSdk
         versionCode = AndroidConfig.versionCode
         versionName = AndroidConfig.versionName
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    compileOptions {
-        sourceCompatibility = AndroidConfig.javaVersion
-        targetCompatibility = AndroidConfig.javaVersion
     }
 
     buildTypes {
@@ -41,13 +27,7 @@ android {
         }
     }
 
-    buildFeatures {
-        compose = true
-    }
-
-    kotlinOptions {
-        jvmTarget = AndroidConfig.jvmTarget
-    }
+    buildFeatures.compose = true
 
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.composeCompilerVersion

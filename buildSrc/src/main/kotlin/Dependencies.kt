@@ -1,7 +1,5 @@
 object Dependencies {
     object Classpath {
-        const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
-        const val androidGradleTools = "com.android.tools.build:gradle:${Versions.gradleToolsVersion}"
         const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
     }
 
@@ -11,6 +9,7 @@ object Dependencies {
         private const val coroutineVersion = "1.3.8"
         const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
         const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVersion"
+        const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
     }
 
     object AndroidX {
@@ -35,6 +34,7 @@ object Dependencies {
 
         private const val retrofitVersion = "2.9.0"
         const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
+        const val retrofitConverter = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
 
         private const val okhttpVersion = "4.9.3"
         const val okHttp = "com.squareup.okhttp3:okhttp:$okhttpVersion"

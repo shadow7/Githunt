@@ -1,7 +1,7 @@
 import org.gradle.api.JavaVersion
 
 object AndroidConfig {
-    const val applicationId = "com.meta.android"
+    const val applicationId = "com.githunt.android"
     const val compileSdk = 31
     const val minSdk = 26
     const val targetSdk = 31
