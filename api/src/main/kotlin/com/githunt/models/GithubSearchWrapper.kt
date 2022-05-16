@@ -1,4 +1,4 @@
-package models
+package com.githunt.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -1,8 +1,9 @@
-package models
+package com.githunt.models
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+
 
 @Serializable
 data class GithubRepository(

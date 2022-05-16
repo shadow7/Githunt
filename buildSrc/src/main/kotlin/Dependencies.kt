@@ -16,6 +16,7 @@ object Dependencies {
         const val appCompat = "androidx.appcompat:appcompat:1.4.0"
         const val activityCompose = "androidx.activity:activity-compose:1.4.0"
         const val coreKtx = "androidx.core:core-ktx:1.7.0"
+        const val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
         const val browser = "androidx.browser:browser:1.4.0"
         const val junit = "junit:junit:4.13.2"
         const val composeUi = "androidx.compose.ui:ui:${Versions.composeCompilerVersion}"

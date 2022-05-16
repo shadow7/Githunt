@@ -1,4 +1,6 @@
-import models.GithubSearchWrapper
+package com.githunt
+
+import com.githunt.models.GithubSearchWrapper
 import retrofit2.http.GET
 import retrofit2.http.Query
 

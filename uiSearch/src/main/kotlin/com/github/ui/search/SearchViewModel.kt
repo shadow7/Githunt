@@ -4,15 +4,20 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import engine.githubApi
+import com.githunt.engine.githubApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import models.GithubRepository
+import com.githunt.models.GithubRepository
+import kotlin.reflect.KProperty
 
-class SearchViewModel : ViewModel() {
-    var movieListResponse: List<GithubRepository> by mutableStateOf(listOf())
+class SearchViewModel(state: SavedStateHandle) : ViewModel() {
+    var movieListResponse: List<GithubRepository>
+    by mutableStateOf(listOf())
+        private set
+
     var errorMessage: String by mutableStateOf("")
     fun getStarsList() {
         viewModelScope.launch(Dispatchers.IO) {
