@@ -4,6 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GithubSearchWrapper(
-    @SerialName("items") val items: List<GithubRepository>
+data class GithubRepositoryWrapper(
+    @SerialName("items") val items: List<GithubOwnerProject>
+)
+
+@Serializable
+data class GithubOwnersWrapper(
+    @SerialName("items") val items: List<GithubOwner>
 )

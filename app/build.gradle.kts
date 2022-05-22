@@ -4,15 +4,6 @@ plugins {
     `android-config-plugin`
 }
 
-dependencies {
-    implementation(Dependencies.AndroidX.activityCompose)
-    implementation(Dependencies.AndroidX.appCompat)
-    implementation(Dependencies.AndroidX.composeUi)
-    implementation(Dependencies.AndroidX.composeMaterial)
-    implementation(Dependencies.Google.material)
-    api(project(":uiSearch"))
-}
-
 @Suppress("UnstableApiUsage")
 android {
     defaultConfig {
@@ -32,4 +23,14 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.composeCompilerVersion
     }
+}
+
+dependencies {
+    implementation(Dependencies.AndroidX.activityCompose)
+    implementation(Dependencies.AndroidX.appCompat)
+    implementation(Dependencies.AndroidX.composeUi)
+    implementation(Dependencies.AndroidX.composeMaterial)
+    implementation(Dependencies.AndroidX.navhost)
+    implementation(Dependencies.Google.material)
+    api(project(":uiSearch"))
 }

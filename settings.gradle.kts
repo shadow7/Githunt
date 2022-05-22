@@ -9,4 +9,5 @@ rootProject.name = "Githunt"
 
 include(":app")
 include(":api")
-include("uiSearch")
+include(":uiSearch")
+include(":uiRepositoryDetails")
