@@ -1,8 +1,6 @@
 package com.github.ui.search
 
-import android.content.Context
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,17 +19,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.githunt.models.GithubOwner
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun SearchFeature(viewModel: SearchViewModel) {
+fun SearchFeature(
+    viewModel: SearchViewModel,
+    openOrgDetails: (String) -> Unit
+) {
     Column(Modifier.fillMaxSize()) {
-        val context: Context = LocalContext.current
         var searchQuery by remember { mutableStateOf("") }
+
+        LaunchedEffect(true) {
+            searchQuery = viewModel.searchQueryFlow.value
+        }
 
         SearchField(
             value = searchQuery,
@@ -39,13 +42,11 @@ fun SearchFeature(viewModel: SearchViewModel) {
                 searchQuery = it
                 viewModel.updateSearchQuery(it)
             },
-            onClick = { context.openGithubTab(formatHtmlUrl(it)) }
+            onClick = { openOrgDetails(it) }
         )
-        SearchList(viewModel) { context.openGithubTab(it) }
+        SearchList(viewModel) { openOrgDetails(it) }
     }
 }
-
-private fun formatHtmlUrl(it: String) = "https://github.com/$it"
 
 @Composable
 fun SearchField(
@@ -108,7 +109,7 @@ fun SearchList(
             itemsIndexed(usersList) { index, item ->
                 Column(
                     Modifier
-                        .clickable { onClick(item.htmlUrl) }
+                        .clickable { onClick(item.name) }
                         .padding(8.dp)
                 ) {
                     Text(item.name)
@@ -116,11 +117,5 @@ fun SearchList(
             }
             item { Spacer(Modifier.height(70.dp)) }
         }
-    }
-}
-
-fun Context.openGithubTab(url: String) {
-    CustomTabsIntent.Builder().build().run {
-        launchUrl(this@openGithubTab, Uri.parse(url))
     }
 }

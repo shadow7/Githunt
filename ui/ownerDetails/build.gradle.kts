@@ -15,5 +15,5 @@ dependencies {
     implementation(Dependencies.AndroidX.lifecycleViewModel)
     implementation(Dependencies.AndroidX.composeMaterial)
     implementation(Dependencies.AndroidX.browser)
-    implementation(project(":api"))
+    implementation(project(":data:api"))
 }

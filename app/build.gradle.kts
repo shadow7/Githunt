@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -32,5 +33,7 @@ dependencies {
     implementation(Dependencies.AndroidX.composeMaterial)
     implementation(Dependencies.AndroidX.navhost)
     implementation(Dependencies.Google.material)
-    api(project(":uiSearch"))
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.24.9-beta")
+    api(project(":ui:search"))
+    api(project(":ui:ownerDetails"))
 }

@@ -8,11 +8,11 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
 class SearchViewModel : ViewModel() {
-    private val searchQueryFlow: MutableStateFlow<String?> = MutableStateFlow(value = null)
+    val searchQueryFlow: MutableStateFlow<String> = MutableStateFlow(value = "")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val usersList: Flow<List<GithubOwner>> = searchQueryFlow
-        .filterNotNull()
+        .filter { it.isBlank() }
         .debounce(QUERY_INPUT_DELAY_MILLIS)
         .flatMapLatest { flowOf(githubApi.searchUsers(formatQueryParam(it)).items) }
 

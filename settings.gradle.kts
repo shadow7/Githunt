@@ -8,6 +8,6 @@ pluginManagement {
 rootProject.name = "Githunt"
 
 include(":app")
-include(":api")
-include(":uiSearch")
-include(":uiRepositoryDetails")
+include(":data:api")
+include(":ui:search")
+include(":ui:ownerDetails")

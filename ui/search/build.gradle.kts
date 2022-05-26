@@ -16,5 +16,5 @@ dependencies {
     implementation(Dependencies.AndroidX.composeMaterial)
     implementation(Dependencies.AndroidX.browser)
     implementation(Dependencies.AndroidX.navhost)
-    implementation(project(":api"))
+    implementation(project(":data:api"))
 }
