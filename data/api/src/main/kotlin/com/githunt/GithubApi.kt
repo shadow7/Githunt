@@ -10,13 +10,17 @@ interface GithubApi {
         const val URL = "https://api.github.com/"
     }
 
-    @GET("search/users?&sort=followers&per_page=25")
+    @GET("search/users")
     suspend fun searchUsers(
-        @Query(value = "q", encoded = true) user: String
+        @Query(value = "q", encoded = true) user: String,
+        @Query(value = "per_page") amount: Int = 25,
+        @Query(value = "sort") sort: String = "followers"
     ): GithubOwnersWrapper
 
-    @GET("search/repositories?&sort=stars&order=desc&per_page=3")
-    suspend fun getOrganizationsRepos(
-        @Query(value = "q", encoded = true) organization: String
+    @GET("search/repositories?&sort=stars&order=desc")
+    suspend fun searchOrgsTopRepos(
+        @Query(value = "q", encoded = true) org: String,
+        @Query(value = "per_page") amount: Int = 10
     ): GithubRepositoryWrapper
+
 }

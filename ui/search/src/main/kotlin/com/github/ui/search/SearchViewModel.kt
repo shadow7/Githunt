@@ -1,26 +1,31 @@
 package com.github.ui.search
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.githunt.engine.githubApi
 import com.githunt.models.GithubOwner
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 
 class SearchViewModel : ViewModel() {
-    val searchQueryFlow: MutableStateFlow<String> = MutableStateFlow(value = "")
+    private val searchQueryChannel = Channel<String>(Channel.CONFLATED)
+//    var userQueryResults = mutableStateOf(listOf<GithubOwner>())
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val usersList: Flow<List<GithubOwner>> = searchQueryFlow
-        .filter { it.isBlank() }
+    val usersFlow = searchQueryChannel
+        .receiveAsFlow()
+        .filterNot { it.isBlank() }
         .debounce(QUERY_INPUT_DELAY_MILLIS)
-        .flatMapLatest { flowOf(githubApi.searchUsers(formatQueryParam(it)).items) }
-
+        .flatMapLatest { flowOf(githubApi.searchUsers(formatQueryParam(it)).items)}
 
     private fun formatQueryParam(it: String) = "$it+type:org"
 
     fun updateSearchQuery(query: String) {
-        searchQueryFlow.value = query
+        searchQueryChannel.trySend(query)
     }
 
     companion object {

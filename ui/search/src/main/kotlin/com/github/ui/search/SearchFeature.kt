@@ -1,9 +1,9 @@
 package com.github.ui.search
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,11 +31,7 @@ fun SearchFeature(
     openOrgDetails: (String) -> Unit
 ) {
     Column(Modifier.fillMaxSize()) {
-        var searchQuery by remember { mutableStateOf("") }
-
-        LaunchedEffect(true) {
-            searchQuery = viewModel.searchQueryFlow.value
-        }
+        var searchQuery by rememberSaveable { mutableStateOf("") }
 
         SearchField(
             value = searchQuery,
@@ -95,10 +92,10 @@ fun SearchList(
     viewModel: SearchViewModel,
     onClick: (String) -> Unit
 ) {
-    var usersList: List<GithubOwner> by remember { mutableStateOf(emptyList()) }
+    var usersList: List<GithubOwner> by rememberSaveable { mutableStateOf(emptyList()) }
 
-    LaunchedEffect(true) {
-        viewModel.usersList.collectLatest {
+    LaunchedEffect(viewModel.usersFlow) {
+        viewModel.usersFlow.collect {
             usersList = it
         }
     }
@@ -106,7 +103,7 @@ fun SearchList(
     Box {
         LazyColumn {
             item { Spacer(Modifier.height(15.dp)) }
-            itemsIndexed(usersList) { index, item ->
+            items(usersList) { item ->
                 Column(
                     Modifier
                         .clickable { onClick(item.name) }
