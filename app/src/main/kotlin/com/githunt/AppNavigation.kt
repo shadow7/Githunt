@@ -64,11 +64,11 @@ private fun NavGraphBuilder.addSearchScreen(
     composable(root.route) {
         SearchFeature(
             viewModel = searchViewModel,
-            openOrgDetails = {
+            openOrgDetails = { name ->
                 navController.navigate(
                     Screen.OrgDetails.createRoute(
                         root,
-                        it
+                        name
                     )
                 )
             }

@@ -10,9 +10,13 @@ class OwnerDetailsViewModel : ViewModel() {
     private val searchQueryFlow: MutableStateFlow<String> = MutableStateFlow("")
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val organizationProjectsList: Flow<List<GithubOwnerProject>> = searchQueryFlow
+    val organizationReposList: Flow<List<GithubOwnerProject>> = searchQueryFlow
         .filterNot { it.isBlank() }
-        .flatMapLatest { flowOf(githubApi.getOrganizationsRepos(it).items) }
+        .flatMapLatest { query ->
+            flowOf(githubApi.searchOrgsTopRepos("org:$query").items
+                .sortedWith(compareByDescending { item -> item.stars })
+            )
+        }
 
     fun updateSearchQuery(query: String) {
         searchQueryFlow.value = query

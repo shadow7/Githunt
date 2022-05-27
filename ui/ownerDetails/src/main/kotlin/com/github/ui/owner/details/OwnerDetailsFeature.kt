@@ -3,7 +3,9 @@ package com.github.ui.owner.details
 import android.content.Context
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,8 +25,10 @@ fun OwnerDetailsFeature(
     viewModel: OwnerDetailsViewModel,
     organizationName: String
 ) {
-    Column(Modifier.fillMaxSize()) {
-        OwnerProjectsList(viewModel, organizationName)
+    OwnerDetailsTheme {
+        Column(Modifier.fillMaxSize()) {
+            OwnerProjectsList(viewModel, organizationName)
+        }
     }
 }
 
@@ -34,7 +38,7 @@ fun OwnerProjectsList(detailsViewModel: OwnerDetailsViewModel, organizationName:
 
     LaunchedEffect(true) {
         detailsViewModel.updateSearchQuery(organizationName)
-        detailsViewModel.organizationProjectsList.collectLatest {
+        detailsViewModel.organizationReposList.collectLatest {
             projectList = it
         }
     }
@@ -43,14 +47,33 @@ fun OwnerProjectsList(detailsViewModel: OwnerDetailsViewModel, organizationName:
 
     LazyColumn {
         itemsIndexed(projectList) { index, item ->
-            Column(
-                Modifier
-                    .clickable { context.openGithubTab(item.htmlUrl) }
-                    .padding(8.dp)
-            ) {
-                Text(color = Color.Blue, text = "Item #$index")
-                Text(color = Color.Blue, text = "$item")
-            }
+            detailsItem(context, index, item)
+        }
+    }
+}
+
+@Composable
+private fun detailsItem(
+    context: Context,
+    index: Int,
+    item: GithubOwnerProject
+) {
+    val boxColor = when (index) {
+        0 -> OwnerDetailsTheme.colors.gold
+        1 -> OwnerDetailsTheme.colors.silver
+        2 -> OwnerDetailsTheme.colors.bronze
+        else -> Color.White
+    }
+
+    Box(
+        Modifier
+            .background(boxColor)
+            .clickable { context.openGithubTab(item.htmlUrl) }
+            .padding(8.dp)
+    ) {
+        Column {
+            Text(text = item.name)
+            Text(text = "Stars: ${item.stars}")
         }
     }
 }
