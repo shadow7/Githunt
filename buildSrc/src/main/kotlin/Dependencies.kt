@@ -33,6 +33,7 @@ object Dependencies {
         const val paging = "androidx.paging:paging-runtime-ktx:3.0.0"
         const val browser = "androidx.browser:browser:1.4.0"
         const val coil = "io.coil-kt:coil-compose:2.1.0"
+        const val palette = "androidx.palette:palette-ktx:1.0.0"
         const val junit = "junit:junit:4.13.2"
     }
 

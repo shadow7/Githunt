@@ -1,5 +1,6 @@
 package com.github.ui.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,9 +19,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.githunt.models.GithubOwner
 import kotlinx.coroutines.flow.collectLatest
 
@@ -32,7 +41,7 @@ fun SearchFeature(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var usersList: List<GithubOwner> by rememberSaveable { mutableStateOf(emptyList()) }
 
-    LaunchedEffect(viewModel.usersFlow) {
+    LaunchedEffect(Unit) {
         viewModel.usersFlow.collectLatest {
             usersList = it
         }
@@ -63,12 +72,13 @@ fun SearchField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit
+    onClick: (String) -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(30),
         modifier = modifier
-            .padding(10.dp)
+            .padding(16.dp)
+            .padding(bottom = 16.dp)
             .fillMaxWidth()
             .height(50.dp),
         elevation = 6.dp,
@@ -83,6 +93,7 @@ fun SearchField(
                 value = value,
                 onValueChange = { onValueChange(it) },
                 Modifier.weight(1f),
+                textStyle = TextStyle(fontSize = 20.sp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { onClick(value) })
@@ -90,7 +101,7 @@ fun SearchField(
             Box(Modifier.padding(5.dp)) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = null,
+                    contentDescription = "Search Icon",
                     Modifier
                         .clip(RoundedCornerShape(50))
                         .padding(5.dp)
@@ -105,19 +116,55 @@ fun SearchList(
     usersList: List<GithubOwner>,
     onClick: (GithubOwner) -> Unit
 ) {
-    Box {
-        LazyColumn {
-            item { Spacer(Modifier.height(15.dp)) }
+    if (usersList.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(50)
+                )
+        ) {
+            item {
+                Text(
+                    text = "Organizations:",
+                    modifier = Modifier.padding(start = 12.dp, bottom = 12.dp),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             items(usersList) { item ->
                 Column(
                     Modifier
                         .clickable { onClick(item) }
-                        .padding(8.dp)
+                        .padding(16.dp)
                 ) {
-                    Text(item.name)
+                    Text(
+                        text = item.name,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
             }
-            item { Spacer(Modifier.height(70.dp)) }
+            item { ListFooter() }
         }
+    }
+}
+
+@Composable
+fun ListFooter() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .imePadding()
+    ) {
+        Text(
+            text = "— End of results —",
+            modifier = Modifier
+                .padding(24.dp)
+                .align(Alignment.Center),
+            color = Color.Gray,
+            fontSize = 12.sp
+        )
     }
 }

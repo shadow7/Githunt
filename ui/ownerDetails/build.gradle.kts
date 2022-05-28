@@ -15,5 +15,6 @@ dependencies {
     implementation(Dependencies.AndroidX.composeMaterial)
     implementation(Dependencies.AndroidX.browser)
     implementation(Dependencies.AndroidX.coil)
+    implementation(Dependencies.AndroidX.palette)
     implementation(project(":data:api"))
 }
