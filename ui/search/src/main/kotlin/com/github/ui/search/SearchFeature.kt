@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -28,20 +27,34 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SearchFeature(
     viewModel: SearchViewModel,
-    openOrgDetails: (String) -> Unit
+    openOrgDetails: (String, String) -> Unit
 ) {
-    Column(Modifier.fillMaxSize()) {
-        var searchQuery by rememberSaveable { mutableStateOf("") }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var usersList: List<GithubOwner> by rememberSaveable { mutableStateOf(emptyList()) }
 
+    LaunchedEffect(viewModel.usersFlow) {
+        viewModel.usersFlow.collectLatest {
+            usersList = it
+        }
+    }
+
+    Column(Modifier.fillMaxSize()) {
         SearchField(
             value = searchQuery,
             onValueChange = {
                 searchQuery = it
                 viewModel.updateSearchQuery(it)
             },
-            onClick = { openOrgDetails(it) }
+            onClick = {
+                val owner = usersList.firstOrNull { it.name == searchQuery }
+                if (owner == null) {
+                    openOrgDetails(searchQuery, "")
+                } else {
+                    openOrgDetails(owner.name, owner.avatar)
+                }
+            }
         )
-        SearchList(viewModel) { openOrgDetails(it) }
+        SearchList(usersList) { openOrgDetails(it.name, it.avatar) }
     }
 }
 
@@ -89,24 +102,16 @@ fun SearchField(
 
 @Composable
 fun SearchList(
-    viewModel: SearchViewModel,
-    onClick: (String) -> Unit
+    usersList: List<GithubOwner>,
+    onClick: (GithubOwner) -> Unit
 ) {
-    var usersList: List<GithubOwner> by rememberSaveable { mutableStateOf(emptyList()) }
-
-    LaunchedEffect(viewModel.usersFlow) {
-        viewModel.usersFlow.collect {
-            usersList = it
-        }
-    }
-
     Box {
         LazyColumn {
             item { Spacer(Modifier.height(15.dp)) }
             items(usersList) { item ->
                 Column(
                     Modifier
-                        .clickable { onClick(item.name) }
+                        .clickable { onClick(item) }
                         .padding(8.dp)
                 ) {
                     Text(item.name)

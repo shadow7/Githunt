@@ -16,20 +16,29 @@ internal sealed class Root(val route: String) {
     object Main : Root("Main")
 }
 
-internal sealed class Screen(val screenRoute: String) {
+internal sealed class Screen(private val screenRoute: String) {
     fun createRoute(root: Root) = "${root.route}/$screenRoute"
 
     object Search : Screen("search")
-    object OrgDetails : Screen("org/details/{orgName}") {
-        const val argName: String = "orgName"
 
-        fun createRoute(root: Root, orgName: String): String {
-            return "${root.route}/org/details/$orgName"
+    object OrgDetails : Screen("org/details/{$argName}?${argUrl}={$argUrl}") {
+
+        fun createRoute(root: Root, orgName: String, avatarUrl: String): String {
+            return "${root.route}/org/details/$orgName?${argUrl}=$avatarUrl"
         }
 
         fun orgName(backStackEntry: NavBackStackEntry): String {
             return backStackEntry.arguments?.getString(argName) ?: ""
         }
+
+        fun avatarUrl(backStackEntry: NavBackStackEntry): String {
+            return backStackEntry.arguments?.getString(argUrl) ?: ""
+        }
+    }
+
+    companion object {
+        const val argName: String = "orgName"
+        const val argUrl: String = "avatarUrl"
     }
 }
 
@@ -64,11 +73,12 @@ private fun NavGraphBuilder.addSearchScreen(
     composable(root.route) {
         SearchFeature(
             viewModel = searchViewModel,
-            openOrgDetails = { name ->
+            openOrgDetails = { name, avatarUrl ->
                 navController.navigate(
                     Screen.OrgDetails.createRoute(
                         root,
-                        name
+                        name,
+                        avatarUrl
                     )
                 )
             }
@@ -85,12 +95,17 @@ private fun NavGraphBuilder.addOrgDetailsScreen(
     composable(
         route = Screen.OrgDetails.createRoute(root),
         arguments = listOf(
-            navArgument(Screen.OrgDetails.argName) { type = NavType.StringType }
+            navArgument(Screen.argName) { type = NavType.StringType },
+            navArgument(Screen.argUrl) {
+                type = NavType.StringType
+                defaultValue = ""
+            }
         ),
     ) { backStackEntry ->
         OwnerDetailsFeature(
             viewModel = viewModel,
-            organizationName = Screen.OrgDetails.orgName(backStackEntry)
+            ownerName = Screen.OrgDetails.orgName(backStackEntry),
+            ownerAvatar = Screen.OrgDetails.avatarUrl(backStackEntry)
         )
     }
 }
