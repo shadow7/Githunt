@@ -1,5 +1,7 @@
 package com.githunt.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -9,16 +11,18 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable
+@Parcelize
 data class GithubOwner(
     @SerialName("id") val id: Int,
     @SerialName("login") val name: String,
     @SerialName("avatar_url") val avatar: String,
     @SerialName("html_url") val htmlUrl: String,
     @SerialName("type") val type: GithubUserType
-)
+) : Parcelable
 
 @Serializable(with = GithubUserTypeSerializer::class)
-enum class GithubUserType(val typeName: String) {
+@Parcelize
+enum class GithubUserType(val typeName: String) : Parcelable {
     USER("User"),
     ORGANIZATION("Organization"),
 }

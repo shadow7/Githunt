@@ -1,7 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm")
+    id("com.android.library")
+    id("kotlin-android")
+    id("kotlin-parcelize")
+    `android-config-plugin`
     kotlin("plugin.serialization")
 }
 
