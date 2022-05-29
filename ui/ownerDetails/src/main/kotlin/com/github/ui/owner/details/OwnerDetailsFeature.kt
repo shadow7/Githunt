@@ -1,10 +1,6 @@
 package com.github.ui.owner.details
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.net.Uri
-import android.util.Log
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,43 +13,121 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.drawable.toBitmap
-import androidx.palette.graphics.Palette
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.githunt.models.GithubOwnerProject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun OwnerDetailsFeature(
     viewModel: OwnerDetailsViewModel,
     ownerName: String,
     ownerAvatar: String,
+    openChromeTab: (Context, String) -> Unit
 ) {
-    var projectList: List<GithubOwnerProject> by remember { mutableStateOf(emptyList()) }
+    OwnerDetails(
+        ownerName,
+        ownerAvatar,
+        openChromeTab,
+        { viewModel.organizationRepos(it) },
+        viewModel.imageBackgroundFlow,
+        { viewModel.updateResults(it) },
+        false
+    )
+}
 
-    LaunchedEffect(ownerName) {
-        projectList = viewModel.organizationRepos(ownerName)
-    }
-
+@Composable
+fun OwnerDetails(
+    ownerName: String,
+    ownerAvatar: String,
+    openChromeTab: (Context, String) -> Unit,
+    projectsFlow: suspend (String) -> Flow<List<GithubOwnerProject>>,
+    imageBackgroundFlow: Flow<Color>,
+    avatarEvent: (SuccessResult) -> Unit,
+    isPreview: Boolean
+) {
     OwnerDetailsTheme {
-        OwnerProjectsList(ownerAvatar, projectList)
+        var projectsList: List<GithubOwnerProject> by rememberSaveable { mutableStateOf(emptyList()) }
+
+        LaunchedEffect(projectsFlow) {
+            projectsFlow(ownerName).collectLatest {
+                projectsList = it
+            }
+        }
+
+        OwnerProjectsList(
+            ownerAvatar,
+            projectsList,
+            openChromeTab,
+            imageBackgroundFlow,
+            avatarEvent,
+            isPreview
+        )
     }
 }
 
 @Composable
-private fun DisplayAvatar(
-    ownerAvatar: String
+fun OwnerProjectsList(
+    ownerAvatar: String,
+    projectList: List<GithubOwnerProject>,
+    openChromeTab: (Context, String) -> Unit,
+    imageBackgroundFlow: Flow<Color>,
+    avatarEvent: (SuccessResult) -> Unit,
+    isPreview: Boolean,
+) {
+    val cellCount = 2
+    val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(cellCount) }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(cellCount),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        item(span = span) {
+            DisplayAvatar(
+                ownerAvatar,
+                imageBackgroundFlow,
+                avatarEvent,
+                isPreview
+            )
+        }
+        item(span = span) { Spacer(modifier = Modifier.height(8.dp)) }
+        itemsIndexed(projectList) { index, item ->
+            DetailsItem(index, item, openChromeTab)
+        }
+    }
+}
+
+@Composable
+private fun AvatarPlaceholder() {
+    Icon(Icons.Default.Person, "", modifier = Modifier.fillMaxSize())
+}
+
+@Composable
+private fun Avatar(
+    ownerAvatar: String,
+    imageBackgroundFlow: Flow<Color>,
+    avatarEvent: (SuccessResult) -> Unit
 ) {
     var imageBackground: Color by remember { mutableStateOf(Color.Gray) }
+
+    LaunchedEffect(imageBackground) {
+        imageBackgroundFlow.collectLatest {
+            imageBackground = it
+        }
+    }
     Box(
         modifier = Modifier
             .background(imageBackground)
@@ -65,17 +139,7 @@ private fun DisplayAvatar(
                 .data(ownerAvatar)
                 .allowHardware(false)
                 .allowConversionToBitmap(true)
-                .listener(onSuccess = { _, result ->
-                    Palette.from(result.drawable.toBitmap(config = Bitmap.Config.RGBA_F16))
-                        .maximumColorCount(16)
-                        .generate {
-                            imageBackground = Color(
-                                it?.lightMutedSwatch?.rgb
-                                    ?: it?.mutedSwatch?.rgb
-                                    ?: Color.Blue.toArgb()
-                            )
-                        }
-                })
+                .listener(onSuccess = { _, result -> avatarEvent(result) })
                 .crossfade(true)
                 .crossfade(600)
                 .build(),
@@ -90,25 +154,35 @@ private fun DisplayAvatar(
 }
 
 @Composable
-fun OwnerProjectsList(ownerAvatar: String, projectList: List<GithubOwnerProject>) {
-    val cellCount = 2
-    val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(cellCount) }
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(cellCount),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        item(span = span) { DisplayAvatar(ownerAvatar) }
-        itemsIndexed(projectList) { index, item ->
-            DetailsItem(index, item)
+private fun DisplayAvatar(
+    ownerAvatar: String,
+    imageBackgroundFlow: Flow<Color>,
+    avatarEvent: (SuccessResult) -> Unit,
+    isPreview: Boolean
+) {
+    if (isPreview) {
+        Box(
+            modifier = Modifier
+                .background(Color.Gray)
+                .fillMaxWidth(1f)
+                .height(250.dp)
+        ) {
+            AvatarPlaceholder()
         }
+    } else {
+        Avatar(
+            ownerAvatar = ownerAvatar,
+            imageBackgroundFlow = imageBackgroundFlow,
+            avatarEvent = avatarEvent
+        )
     }
 }
 
 @Composable
 private fun DetailsItem(
     index: Int,
-    item: GithubOwnerProject
+    item: GithubOwnerProject,
+    openChromeTab: (Context, String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -122,7 +196,7 @@ private fun DetailsItem(
     Card(
         shape = RoundedCornerShape(15),
         modifier = Modifier
-            .clickable { context.openGithubTab(item.htmlUrl) }
+            .clickable { openChromeTab(context, item.htmlUrl) }
             .padding(8.dp),
         elevation = 6.dp
     ) {
@@ -148,8 +222,24 @@ private fun DetailsItem(
     }
 }
 
-fun Context.openGithubTab(url: String) {
-    CustomTabsIntent.Builder().build().run {
-        launchUrl(this@openGithubTab, Uri.parse(url))
-    }
+@Preview(showBackground = true)
+@Composable
+fun DetailsPreview() {
+    OwnerDetails(
+        "square",
+        "https://avatars.githubusercontent.com/u/82592",
+        { _, _ -> },
+        {
+            flowOf(
+                listOf(
+                    GithubOwnerProject(name = "okhttp", stars = 3),
+                    GithubOwnerProject(name ="retrofit",stars = 2),
+                    GithubOwnerProject(name ="okio",stars = 1)
+                )
+            )
+        },
+        flowOf(Color.Gray),
+        {},
+        true
+    )
 }

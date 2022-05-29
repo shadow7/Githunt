@@ -2,6 +2,7 @@ package com.github.ui.search
 
 import androidx.lifecycle.ViewModel
 import com.githunt.engine.githubApi
+import com.githunt.models.GithubOwner
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -11,7 +12,7 @@ class SearchViewModel : ViewModel() {
     private val searchQueryChannel = Channel<String>(Channel.CONFLATED)
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val usersFlow = searchQueryChannel
+    val usersFlow: Flow<List<GithubOwner>> = searchQueryChannel
         .receiveAsFlow()
         .filterNot { it.isBlank() }
         .debounce(QUERY_INPUT_DELAY_MILLIS)
@@ -24,6 +25,6 @@ class SearchViewModel : ViewModel() {
     }
 
     companion object {
-        private const val QUERY_INPUT_DELAY_MILLIS = 300L
+        private const val QUERY_INPUT_DELAY_MILLIS = 400L
     }
 }

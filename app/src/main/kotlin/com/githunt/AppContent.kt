@@ -16,7 +16,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
-internal fun AppContent(searchViewModel: SearchViewModel, detailsViewModel: OwnerDetailsViewModel) {
+internal fun AppContent(searchViewModel: SearchViewModel) {
     val navController = rememberAnimatedNavController()
 
     Scaffold { padding ->
@@ -24,7 +24,7 @@ internal fun AppContent(searchViewModel: SearchViewModel, detailsViewModel: Owne
             modifier = Modifier.padding(padding)
         ) {
             GithuntTheme(true) {
-                AppNavigation(navController, searchViewModel, detailsViewModel)
+                AppNavigation(navController, searchViewModel)
             }
         }
     }

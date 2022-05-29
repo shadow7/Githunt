@@ -20,7 +20,7 @@ interface GithubApi {
     @GET("search/repositories?&sort=stars&order=desc")
     suspend fun searchOrgsTopRepos(
         @Query(value = "q", encoded = true) org: String,
-        @Query(value = "per_page") amount: Int = 10
+        @Query(value = "per_page") amount: Int = 16
     ): GithubRepositoryWrapper
 
 }

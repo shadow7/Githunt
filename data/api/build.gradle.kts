@@ -14,5 +14,5 @@ dependencies {
     implementation(Dependencies.Squareup.retrofit)
     implementation(Dependencies.Squareup.retrofitConverter)
     implementation(Dependencies.JetBrains.serializationJson)
-    implementation(Dependencies.JetBrains.dateTime)
+    api(Dependencies.JetBrains.dateTime)
 }

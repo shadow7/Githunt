@@ -19,31 +19,31 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.githunt.models.GithubOwner
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun SearchFeature(
-    viewModel: SearchViewModel,
-    openOrgDetails: (String, String) -> Unit
+    query: String,
+    ownerFlow: Flow<List<GithubOwner>>,
+    updateSearchQuery: (String) -> Unit = {},
+    openOrgDetails: (String, String) -> Unit = { _, _ -> }
 ) {
-    var searchQuery by rememberSaveable { mutableStateOf("") }
-    var usersList: List<GithubOwner> by rememberSaveable { mutableStateOf(emptyList()) }
+    var searchQuery by rememberSaveable { mutableStateOf(query) }
+    var ownerList: List<GithubOwner> by rememberSaveable { mutableStateOf(emptyList()) }
 
-    LaunchedEffect(Unit) {
-        viewModel.usersFlow.collectLatest {
-            usersList = it
+    LaunchedEffect(ownerFlow) {
+        ownerFlow.collectLatest {
+            ownerList = it
         }
     }
 
@@ -52,10 +52,10 @@ fun SearchFeature(
             value = searchQuery,
             onValueChange = {
                 searchQuery = it
-                viewModel.updateSearchQuery(it)
+                updateSearchQuery(it)
             },
             onClick = {
-                val owner = usersList.firstOrNull { it.name == searchQuery }
+                val owner = ownerList.firstOrNull { it.name == searchQuery }
                 if (owner == null) {
                     openOrgDetails(searchQuery, "")
                 } else {
@@ -63,7 +63,7 @@ fun SearchFeature(
                 }
             }
         )
-        SearchList(usersList) { openOrgDetails(it.name, it.avatar) }
+        SearchList(ownerList) { openOrgDetails(it.name, it.avatar) }
     }
 }
 
@@ -78,7 +78,6 @@ fun SearchField(
         shape = RoundedCornerShape(30),
         modifier = modifier
             .padding(16.dp)
-            .padding(bottom = 16.dp)
             .fillMaxWidth()
             .height(50.dp),
         elevation = 6.dp,
@@ -120,15 +119,17 @@ fun SearchList(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(16.dp)
                 .background(
                     color = Color.White,
-                    shape = RoundedCornerShape(50)
+                    shape = RoundedCornerShape(10)
                 )
         ) {
+            item { Spacer(modifier = Modifier.height(8.dp)) }
             item {
                 Text(
                     text = "Organizations:",
-                    modifier = Modifier.padding(start = 12.dp, bottom = 12.dp),
+                    modifier = Modifier.padding(start = 12.dp, bottom = 8.dp),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -167,4 +168,10 @@ fun ListFooter() {
             fontSize = 12.sp
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    SearchFeature("nytimes", flowOf(listOf(GithubOwner(name = "nytimes"))), {}) { _, _ -> }
 }

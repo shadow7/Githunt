@@ -7,6 +7,7 @@ import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.github.ui.owner.details.OwnerDetailsFeature
 import com.github.ui.owner.details.OwnerDetailsViewModel
+import com.github.ui.owner.details.openGithubTab
 import com.github.ui.search.SearchFeature
 import com.github.ui.search.SearchViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -18,8 +19,6 @@ internal sealed class Root(val route: String) {
 
 internal sealed class Screen(private val screenRoute: String) {
     fun createRoute(root: Root) = "${root.route}/$screenRoute"
-
-    object Search : Screen("search")
 
     object OrgDetails : Screen("org/details/{$argName}?${argUrl}={$argUrl}") {
 
@@ -47,7 +46,6 @@ internal sealed class Screen(private val screenRoute: String) {
 internal fun AppNavigation(
     navController: NavHostController,
     searchViewModel: SearchViewModel,
-    detailsViewModel: OwnerDetailsViewModel,
     modifier: Modifier = Modifier,
 ) {
     AnimatedNavHost(
@@ -60,7 +58,7 @@ internal fun AppNavigation(
         modifier = modifier,
     ) {
         addSearchScreen(navController, searchViewModel, Root.Main)
-        addOrgDetailsScreen(navController, detailsViewModel, Root.Main)
+        addOrgDetailsScreen(Root.Main)
     }
 }
 
@@ -72,24 +70,23 @@ private fun NavGraphBuilder.addSearchScreen(
 ) {
     composable(root.route) {
         SearchFeature(
-            viewModel = searchViewModel,
-            openOrgDetails = { name, avatarUrl ->
-                navController.navigate(
-                    Screen.OrgDetails.createRoute(
-                        root,
-                        name,
-                        avatarUrl
-                    )
+            query = "",
+            ownerFlow = searchViewModel.usersFlow,
+            updateSearchQuery = { searchViewModel.updateSearchQuery(it) }
+        ) { name, avatarUrl ->
+            navController.navigate(
+                Screen.OrgDetails.createRoute(
+                    root,
+                    name,
+                    avatarUrl
                 )
-            }
-        )
+            )
+        }
     }
 }
 
 @ExperimentalAnimationApi
 private fun NavGraphBuilder.addOrgDetailsScreen(
-    navController: NavController,
-    viewModel: OwnerDetailsViewModel,
     root: Root,
 ) {
     composable(
@@ -102,10 +99,13 @@ private fun NavGraphBuilder.addOrgDetailsScreen(
             }
         ),
     ) { backStackEntry ->
+        val viewModel = OwnerDetailsViewModel()
+
         OwnerDetailsFeature(
-            viewModel = viewModel,
+            viewModel = viewModel ,
             ownerName = Screen.OrgDetails.orgName(backStackEntry),
-            ownerAvatar = Screen.OrgDetails.avatarUrl(backStackEntry)
+            ownerAvatar = Screen.OrgDetails.avatarUrl(backStackEntry),
+            openChromeTab = { context, url -> context.openGithubTab(url)}
         )
     }
 }

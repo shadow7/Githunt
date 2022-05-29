@@ -9,11 +9,10 @@ import com.github.ui.search.SearchViewModel
 
 class MainActivity : ComponentActivity() {
     private val searchViewModel: SearchViewModel by viewModels()
-    private val detailsViewModel: OwnerDetailsViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppContent(searchViewModel, detailsViewModel)
+            AppContent(searchViewModel)
         }
     }
 }

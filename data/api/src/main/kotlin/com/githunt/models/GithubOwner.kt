@@ -13,11 +13,11 @@ import kotlinx.serialization.encoding.Encoder
 @Serializable
 @Parcelize
 data class GithubOwner(
-    @SerialName("id") val id: Int,
     @SerialName("login") val name: String,
-    @SerialName("avatar_url") val avatar: String,
-    @SerialName("html_url") val htmlUrl: String,
-    @SerialName("type") val type: GithubUserType
+    @SerialName("id") val id: Int = 0,
+    @SerialName("avatar_url") val avatar: String = "",
+    @SerialName("html_url") val htmlUrl: String = "",
+    @SerialName("type") val type: GithubUserType = GithubUserType.ORGANIZATION
 ) : Parcelable
 
 @Serializable(with = GithubUserTypeSerializer::class)
