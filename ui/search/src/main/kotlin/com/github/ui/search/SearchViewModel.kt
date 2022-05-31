@@ -1,5 +1,6 @@
 package com.github.ui.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.githunt.engine.githubApi
 import com.githunt.models.GithubOwner
@@ -16,7 +17,16 @@ class SearchViewModel : ViewModel() {
         .receiveAsFlow()
         .filterNot { it.isBlank() }
         .debounce(QUERY_INPUT_DELAY_MILLIS)
-        .flatMapLatest { flowOf(githubApi.searchUsers(formatQueryParam(it)).items) }
+        .flatMapLatest { githubOwners(it) }
+
+    private suspend fun githubOwners(query: String) = flowOf(
+        try {
+            githubApi.searchUsers(formatQueryParam(query)).items
+        } catch (e: Exception) {
+            Log.e(SearchViewModel::class.simpleName, "GithubOwners call failed", e)
+            emptyList()
+        }
+    )
 
     private fun formatQueryParam(it: String) = "$it+type:org"
 

@@ -1,6 +1,7 @@
 package com.github.ui.owner.details
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.toBitmap
@@ -44,11 +45,14 @@ class OwnerDetailsViewModel : ViewModel() {
         successResults.trySend(result)
     }
 
-    fun organizationRepos(query: String): Flow<List<GithubOwnerProject>> =
-        flow {
-            emit(
+    suspend fun organizationRepos(query: String): Flow<List<GithubOwnerProject>> =
+        flowOf(
+            try {
                 githubApi.searchOrgsTopRepos("org:$query").items
                     .sortedWith(compareByDescending { item -> item.stars })
-            )
-        }
+            } catch (e: Exception) {
+                Log.e(OwnerDetailsViewModel::class.simpleName, "organizationRepos call failed", e)
+                emptyList()
+            }
+        )
 }
