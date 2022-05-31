@@ -33,7 +33,7 @@ dependencies {
     implementation(Dependencies.AndroidX.composeMaterial)
     implementation(Dependencies.AndroidX.navhost)
     implementation(Dependencies.Google.material)
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.24.9-beta")
+    implementation(Dependencies.Google.navigationAnimation)
     api(project(":ui:search"))
     api(project(":ui:ownerDetails"))
 }

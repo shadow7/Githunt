@@ -233,8 +233,8 @@ fun DetailsPreview() {
             flowOf(
                 listOf(
                     GithubOwnerProject(name = "okhttp", stars = 3),
-                    GithubOwnerProject(name ="retrofit",stars = 2),
-                    GithubOwnerProject(name ="okio",stars = 1)
+                    GithubOwnerProject(name = "retrofit", stars = 2),
+                    GithubOwnerProject(name = "okio", stars = 1)
                 )
             )
         },
