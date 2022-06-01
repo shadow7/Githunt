@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.fusesource.jansi.AnsiRenderer.test
-
 plugins {
     id("com.android.application")
     kotlin("android")

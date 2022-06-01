@@ -40,7 +40,8 @@ object Dependencies {
 
     object Google {
         const val material = "com.google.android.material:material:1.6.0"
-        const val navigationAnimation = "com.google.accompanist:accompanist-navigation-animation:0.24.9-beta"
+        const val navigationAnimation =
+            "com.google.accompanist:accompanist-navigation-animation:0.24.9-beta"
     }
 
     object Squareup {
