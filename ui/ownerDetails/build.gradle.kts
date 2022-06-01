@@ -24,7 +24,6 @@ dependencies {
     api(Dependencies.AndroidX.palette)
     api(project(":data:api"))
     implementation(project(":common"))
-    testImplementation(testFixtures(project(":common")))
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.arch.core:core-testing:2.1.0")
     testImplementation("androidx.test.ext:junit-ktx:1.1.3")

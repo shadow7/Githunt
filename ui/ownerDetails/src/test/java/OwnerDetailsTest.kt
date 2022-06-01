@@ -8,17 +8,13 @@ import com.githunt.models.GithubRepositoryWrapper
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.mockk
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,7 +45,7 @@ class OwnerDetailsTest {
     }
 
     @Test
-    fun searchSuccess() = runBlocking {
+    fun searchSuccess() = runTest {
         launch {
             viewModel.projectsFlow.test {
                 assertEquals(items, awaitItem())
@@ -62,12 +58,15 @@ class OwnerDetailsTest {
             GithubRepositoryWrapper(items)
         )
         viewModel.updateSearchQuery("a")
+        advanceTimeBy(100)
         viewModel.updateSearchQuery("b")
+        advanceTimeBy(100)
         viewModel.updateSearchQuery("c")
+        advanceTimeBy(100)
     }
 
     @Test
-    fun searchFailure() = runBlocking {
+    fun searchFailure() = runTest {
         launch {
             viewModel.projectsFlow.test {
                 expectNoEvents()
@@ -82,7 +81,7 @@ class OwnerDetailsTest {
     }
 
     @Test
-    fun getSuccessPalette() = runBlocking {
+    fun getSuccessPalette() = runTest {
         launch {
             viewModel.imageBackgroundFlow.test {
                 assertEquals(paletteColor, awaitItem())

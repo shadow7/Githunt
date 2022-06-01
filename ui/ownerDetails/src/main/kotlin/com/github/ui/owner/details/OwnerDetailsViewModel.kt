@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.github.ui.owner.details
 
 import android.util.Log
@@ -7,6 +9,7 @@ import coil.request.SuccessResult
 import com.githunt.GithubApi
 import com.githunt.models.GithubOwnerProject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
