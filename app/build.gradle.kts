@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.fusesource.jansi.AnsiRenderer.test
 
 plugins {
     id("com.android.application")
@@ -7,6 +8,7 @@ plugins {
 
 @Suppress("UnstableApiUsage")
 android {
+
     defaultConfig {
         applicationId = AndroidConfig.applicationId
         versionCode = AndroidConfig.versionCode
@@ -27,13 +29,10 @@ android {
 }
 
 dependencies {
-    implementation(Dependencies.AndroidX.activityCompose)
-    implementation(Dependencies.AndroidX.appCompat)
-    implementation(Dependencies.AndroidX.composeUi)
-    implementation(Dependencies.AndroidX.composeMaterial)
-    implementation(Dependencies.AndroidX.navhost)
     implementation(Dependencies.Google.material)
+    implementation(Dependencies.AndroidX.navhost)
     implementation(Dependencies.Google.navigationAnimation)
-    api(project(":ui:search"))
-    api(project(":ui:ownerDetails"))
+    implementation(project(":common"))
+    implementation(project(":ui:search"))
+    implementation(project(":ui:ownerDetails"))
 }

@@ -42,9 +42,10 @@ fun OwnerDetailsFeature(
         ownerName,
         ownerAvatar,
         openChromeTab,
-        { viewModel.organizationRepos(it) },
+        viewModel.projectsFlow,
         viewModel.imageBackgroundFlow,
-        { viewModel.updateResults(it) },
+        { viewModel.updateAvatarDownloadResults(it) },
+        { viewModel.updateSearchQuery(it) },
         false
     )
 }
@@ -54,16 +55,18 @@ fun OwnerDetails(
     ownerName: String,
     ownerAvatar: String,
     openChromeTab: (Context, String) -> Unit,
-    projectsFlow: suspend (String) -> Flow<List<GithubOwnerProject>>,
+    projectsFlow: Flow<List<GithubOwnerProject>>,
     imageBackgroundFlow: Flow<Color>,
     avatarEvent: (SuccessResult) -> Unit,
+    updateQuery: (String) -> Unit,
     isPreview: Boolean
 ) {
     OwnerDetailsTheme {
         var projectsList: List<GithubOwnerProject> by rememberSaveable { mutableStateOf(emptyList()) }
 
-        LaunchedEffect(projectsFlow) {
-            projectsFlow(ownerName).collectLatest {
+        LaunchedEffect(ownerName) {
+            updateQuery(ownerName)
+            projectsFlow.collectLatest {
                 projectsList = it
             }
         }
@@ -121,7 +124,7 @@ private fun Avatar(
     imageBackgroundFlow: Flow<Color>,
     avatarEvent: (SuccessResult) -> Unit
 ) {
-    var imageBackground: Color by remember { mutableStateOf(Color.Gray) }
+    var imageBackground: Color by remember { mutableStateOf(Color.LightGray) }
 
     LaunchedEffect(imageBackground) {
         imageBackgroundFlow.collectLatest {
@@ -163,7 +166,7 @@ private fun DisplayAvatar(
     if (isPreview) {
         Box(
             modifier = Modifier
-                .background(Color.Gray)
+                .background(Color.LightGray)
                 .fillMaxWidth(1f)
                 .height(250.dp)
         ) {
@@ -229,16 +232,15 @@ fun DetailsPreview() {
         "square",
         "https://avatars.githubusercontent.com/u/82592",
         { _, _ -> },
-        {
-            flowOf(
-                listOf(
-                    GithubOwnerProject(name = "okhttp", stars = 3),
-                    GithubOwnerProject(name = "retrofit", stars = 2),
-                    GithubOwnerProject(name = "okio", stars = 1)
-                )
+        flowOf(
+            listOf(
+                GithubOwnerProject(name = "okhttp", stars = 3),
+                GithubOwnerProject(name = "retrofit", stars = 2),
+                GithubOwnerProject(name = "okio", stars = 1)
             )
-        },
-        flowOf(Color.Gray),
+        ),
+        flowOf(Color.LightGray),
+        {},
         {},
         true
     )

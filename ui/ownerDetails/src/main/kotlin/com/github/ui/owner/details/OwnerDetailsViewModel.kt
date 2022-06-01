@@ -1,58 +1,63 @@
 package com.github.ui.owner.details
 
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.palette.graphics.Palette
 import coil.request.SuccessResult
-import com.githunt.engine.githubApi
+import com.githunt.GithubApi
 import com.githunt.models.GithubOwnerProject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
-class OwnerDetailsViewModel : ViewModel() {
+class OwnerDetailsViewModel(
+    githubApi: GithubApi,
+    dispatcher: CoroutineDispatcher,
+    getPalette: suspend (SuccessResult) -> Color
+) : ViewModel() {
 
-    private val successResults: Channel<SuccessResult> = Channel(Channel.CONFLATED)
+    private val avatarDownloadResults: Channel<SuccessResult> = Channel(Channel.CONFLATED)
+    private val searchQuery: Channel<String> = Channel(Channel.CONFLATED)
 
-    val imageBackgroundFlow: Flow<Color> = successResults.receiveAsFlow()
+    val imageBackgroundFlow: Flow<Color> = avatarDownloadResults.receiveAsFlow()
         .flatMapLatest {
             callbackFlow {
-                Palette.from(it.drawable.toBitmap(config = Bitmap.Config.RGBA_F16))
-                    .maximumColorCount(16)
-                    .generate {
-                        viewModelScope.launch {
-                            trySend(
-                                Color(
-                                    it?.lightMutedSwatch?.rgb
-                                        ?: it?.mutedSwatch?.rgb
-                                        ?: Color.Blue.toArgb()
-                                )
-                            )
-                        }
-                    }
+                trySend(getPalette(it))
                 awaitClose { cancel() }
             }
         }
 
-    fun updateResults(result: SuccessResult) {
-        successResults.trySend(result)
+    val projectsFlow: Flow<List<GithubOwnerProject>> = searchQuery.receiveAsFlow()
+        .flatMapLatest { query ->
+            flowOf(
+                try {
+                    val result = githubApi.searchOrgsTopRepos("org:$query")
+                    val body = result.body()
+                    if (result.isSuccessful && body != null) {
+                        body.items
+                            .sortedWith(compareByDescending { item -> item.stars })
+                    } else {
+                        emptyList()
+                    }
+                } catch (e: Exception) {
+                    Log.e(
+                        OwnerDetailsViewModel::class.simpleName,
+                        "organizationRepos call failed",
+                        e
+                    )
+                    emptyList()
+                }
+            )
+        }.filterNot { it.isEmpty() }
+        .flowOn(dispatcher)
+
+    fun updateAvatarDownloadResults(result: SuccessResult) {
+        avatarDownloadResults.trySend(result)
     }
 
-    suspend fun organizationRepos(query: String): Flow<List<GithubOwnerProject>> =
-        flowOf(
-            try {
-                githubApi.searchOrgsTopRepos("org:$query").items
-                    .sortedWith(compareByDescending { item -> item.stars })
-            } catch (e: Exception) {
-                Log.e(OwnerDetailsViewModel::class.simpleName, "organizationRepos call failed", e)
-                emptyList()
-            }
-        )
+    fun updateSearchQuery(query: String) {
+        searchQuery.trySend(query)
+    }
 }

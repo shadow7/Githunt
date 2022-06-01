@@ -7,6 +7,7 @@ buildscript {
 
     dependencies {
         classpath(Dependencies.Classpath.kotlinSerialization)
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
     }
 }
 

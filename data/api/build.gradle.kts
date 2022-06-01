@@ -11,7 +11,7 @@ plugins {
 dependencies {
     implementation(Dependencies.Squareup.okHttp)
     implementation(Dependencies.Squareup.okHttpLogging)
-    implementation(Dependencies.Squareup.retrofit)
+    api(Dependencies.Squareup.retrofit)
     implementation(Dependencies.Squareup.retrofitConverter)
     implementation(Dependencies.JetBrains.serializationJson)
     api(Dependencies.JetBrains.dateTime)

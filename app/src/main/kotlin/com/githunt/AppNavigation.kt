@@ -7,9 +7,9 @@ import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.github.ui.owner.details.OwnerDetailsFeature
 import com.github.ui.owner.details.OwnerDetailsViewModel
-import com.github.ui.owner.details.openGithubTab
 import com.github.ui.search.SearchFeature
 import com.github.ui.search.SearchViewModel
+import com.githunt.common.openGithubTab
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 
@@ -46,7 +46,8 @@ internal sealed class Screen(private val screenRoute: String) {
 internal fun AppNavigation(
     navController: NavHostController,
     searchViewModel: SearchViewModel,
-    modifier: Modifier = Modifier,
+    ownerDetailsViewModel: OwnerDetailsViewModel,
+    modifier: Modifier = Modifier
 ) {
     AnimatedNavHost(
         navController = navController,
@@ -58,7 +59,7 @@ internal fun AppNavigation(
         modifier = modifier,
     ) {
         addSearchScreen(navController, searchViewModel, Root.Main)
-        addOrgDetailsScreen(Root.Main)
+        addOrgDetailsScreen(Root.Main, ownerDetailsViewModel)
     }
 }
 
@@ -88,6 +89,7 @@ private fun NavGraphBuilder.addSearchScreen(
 @ExperimentalAnimationApi
 private fun NavGraphBuilder.addOrgDetailsScreen(
     root: Root,
+    viewModel: OwnerDetailsViewModel,
 ) {
     composable(
         route = Screen.OrgDetails.createRoute(root),
@@ -99,13 +101,11 @@ private fun NavGraphBuilder.addOrgDetailsScreen(
             }
         ),
     ) { backStackEntry ->
-        val viewModel = OwnerDetailsViewModel()
-
         OwnerDetailsFeature(
-            viewModel = viewModel ,
+            viewModel = viewModel,
             ownerName = Screen.OrgDetails.orgName(backStackEntry),
             ownerAvatar = Screen.OrgDetails.avatarUrl(backStackEntry),
-            openChromeTab = { context, url -> context.openGithubTab(url)}
+            openChromeTab = { context, url -> context.openGithubTab(url) }
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.github.ui.owner.details
+package com.githunt.common
 
 import android.content.Context
 import android.net.Uri
