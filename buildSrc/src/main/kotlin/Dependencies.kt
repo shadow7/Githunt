@@ -1,5 +1,6 @@
 object Dependencies {
     object Classpath {
+        const val jacoco = "org.jacoco:org.jacoco.core:0.8.5"
         const val kotlinSerialization =
             "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
     }

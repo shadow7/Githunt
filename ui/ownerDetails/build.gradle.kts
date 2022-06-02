@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     `android-config-plugin`
+    jacoco
 }
 
 @Suppress("UnstableApiUsage")
